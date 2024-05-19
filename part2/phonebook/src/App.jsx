@@ -1,16 +1,13 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import axios from 'axios'
 import Persons from './components/Persons'
 import PersonForm from './components/PersonForm'
 import Filter from './components/Filter'
+import personService from './services/persons'
 
 const App = () => {
 
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', number: '040-123456', id: 1 },
-    { name: 'Ada Lovelace', number: '39-44-5323523', id: 2 },
-    { name: 'Dan Abramov', number: '12-43-234345', id: 3 },
-    { name: 'Mary Poppendieck', number: '39-23-6423122', id: 4 }
-  ])
+  const [persons, setPersons] = useState([])
 
   const [filteredPersons, setFilteredPersons] = useState(persons)
 
@@ -36,8 +33,11 @@ const App = () => {
         alert(`${newName} is already added to the phonebook`)
       } else {
         const newPerson = { name: newName, number: newNumber, id: persons.length + 1 }
-        setPersons(persons.concat(newPerson))
-        setFilteredPersons(persons.concat(newPerson))
+        personService.create(newPerson)
+        .then(response => {
+          setPersons(persons.concat(response.data))
+          setFilteredPersons(persons.concat(response.data))
+        })
         setFilter('')
         setNewName('') 
         setNewNumber('')
@@ -45,6 +45,26 @@ const App = () => {
     }
   }
 
+  const handleDelete = (id, name)=> {
+    window.confirm(`Delete ${name}?`) &&
+    personService.removeById(id)
+    .then(response => {
+      console.log('before', response)
+      setPersons(persons.filter(person => person.id !== id))
+      setFilteredPersons(persons.filter(person => person.id !== id))
+      console.log('after', response)
+  })
+  }
+
+
+  useEffect(() => {
+    personService
+    .getAll()
+    .then(response => {
+      setPersons(response.data)
+      setFilteredPersons(response.data)
+    })
+  }, [])
 
   return (
     <div>
@@ -60,7 +80,7 @@ const App = () => {
         numberValue={newNumber}
       />
       <h3>Numbers</h3>
-      <Persons persons={filteredPersons}/>
+      <Persons persons={filteredPersons} deleteHandler={handleDelete}/>
     </div>
   )
 }
