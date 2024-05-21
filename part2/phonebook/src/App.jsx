@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
 import Persons from './components/Persons'
 import PersonForm from './components/PersonForm'
 import Filter from './components/Filter'
@@ -22,6 +21,13 @@ const App = () => {
     setFilteredPersons(persons.filter(person => person.name.toLowerCase().startsWith(event.target.value.toLowerCase())))
   }
 
+  const generateId = () => {
+  const maxId = persons.length > 0
+    ? Math.max(...persons.map(person => person.id))
+    : 0
+  return maxId + 1
+}
+
   const handleSubmit = event => {
     event.preventDefault()
     
@@ -30,9 +36,21 @@ const App = () => {
     } else {
       const names = persons.map(person => person.name)
       if(names.includes(newName)) {
-        alert(`${newName} is already added to the phonebook`)
+        if(window.confirm(`Do you want to update ${newName}'s number to ${newNumber} ?`)) {
+          const person = persons.find(person => person.name === newName)
+          const newPerson = { ...person, number: newNumber }
+          personService.edit(newPerson)
+          .then(response => {
+            console.log(response.data)
+            setPersons(persons.map(person => person.id === response.data.id ? response.data : person))
+            setFilteredPersons(persons.map(person => person.id === response.data.id ? response.data : person))
+          })
+          setFilter('')
+          setNewName('')
+          setNewNumber('') 
+        }
       } else {
-        const newPerson = { name: newName, number: newNumber, id: persons.length + 1 }
+        const newPerson = { name: newName, number: newNumber, id: generateId() }
         personService.create(newPerson)
         .then(response => {
           setPersons(persons.concat(response.data))
