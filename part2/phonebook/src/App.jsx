@@ -77,10 +77,10 @@ const App = () => {
     window.confirm(`Delete ${name}?`) &&
     personService.removeById(id)
     .then(response => {
-      console.log('before', response)
       setPersons(persons.filter(person => person.id !== id))
       setFilteredPersons(persons.filter(person => person.id !== id))
-      console.log('after', response)
+      setErrorMessage(`Removed ${name} successfuly`)
+      setTimeout(() => setErrorMessage(null), 3000)
     })
     .catch(error => {
       setErrorMessage(`Information of ${newName} is already removed from the server`)

@@ -1,5 +1,6 @@
 const express = require("express");
 const morgan = require("morgan");
+const cors = require('cors')
 
 const expressApp = express();
 
@@ -10,6 +11,7 @@ const logger = morgan(
 
 expressApp.use(express.json());
 expressApp.use(logger);
+expressApp.use(cors())
 
 let persons = [
   {
@@ -93,6 +95,6 @@ const unknownEndPoint = (req, res) => {
 
 expressApp.use(unknownEndPoint);
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 expressApp.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
