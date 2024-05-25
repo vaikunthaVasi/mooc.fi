@@ -12,6 +12,7 @@ const logger = morgan(
 expressApp.use(express.json());
 expressApp.use(logger);
 expressApp.use(cors())
+expressApp.use(express.static('dist'))
 
 let persons = [
   {
