@@ -2,7 +2,7 @@ const express = require("express");
 const morgan = require("morgan");
 const cors = require('cors')
 const mongoose = require('mongoose')
-const password = "Anshu_11"
+const password = process.argv[2]
 const dbUrl = `mongodb+srv://TheRen:${password}@cluster0.hrx1h8i.mongodb.net/personApp?retryWrites=true&w=majority&appName=Cluster0`
 
 const expressApp = express();
