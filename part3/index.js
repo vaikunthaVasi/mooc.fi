@@ -1,8 +1,13 @@
 const express = require("express");
 const morgan = require("morgan");
 const cors = require('cors')
+const mongoose = require('mongoose')
+const password = "Anshu_11"
+const dbUrl = `mongodb+srv://TheRen:${password}@cluster0.hrx1h8i.mongodb.net/personApp?retryWrites=true&w=majority&appName=Cluster0`
 
 const expressApp = express();
+
+
 
 morgan.token("body", (req) => JSON.stringify(req.body));
 const logger = morgan(
@@ -13,6 +18,16 @@ expressApp.use(express.json());
 expressApp.use(logger);
 expressApp.use(cors())
 expressApp.use(express.static('dist'))
+
+mongoose.set('strictQuery', false)
+mongoose.connect(dbUrl)
+
+const personSchema = new mongoose.Schema({
+  name: String,
+  number: String
+})
+
+const Person = mongoose.model('Person', personSchema)
 
 let persons = [
   {
@@ -47,7 +62,7 @@ expressApp.get("/", (req, res) => {
 });
 
 expressApp.get("/api/persons", (req, res) => {
-  res.json(persons);
+  Person.find({}).then(persons => res.json(persons))
 });
 
 expressApp.get("/api/persons/:id", (req, res) => {
